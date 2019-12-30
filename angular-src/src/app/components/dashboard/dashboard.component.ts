@@ -12,6 +12,8 @@ export class DashboardComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
+    localStorage.setItem('returnUrl', '/dashboard');
+
     this.authService.getProfile().subscribe(
       profile => {
         // console.log(profile);

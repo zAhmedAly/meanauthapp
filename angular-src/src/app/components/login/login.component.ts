@@ -22,23 +22,30 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Get the query params
-    this.route.queryParams.subscribe(params => {
-      console.log(
-        'LoginComponent ngOnInit params[returnUrl] = ',
-        params['returnUrl']
-      );
-      this.returnUrl = params['returnUrl'] || '/dashboard';
-    });
+    // get return url from route parameters or default to '/'
+    this.returnUrl =
+      this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    localStorage.setItem('returnUrl', this.returnUrl);
     console.log('LoginComponent ngOnInit this.returnUrl = ', this.returnUrl);
+
+    // Get the query params
+    // this.route.queryParams.subscribe(params => {
+    //   console.log(
+    //     'LoginComponent ngOnInit params[returnUrl] = ',
+    //     params['returnUrl']
+    //   );
+    //   this.returnUrl = params['returnUrl'] || '/dashboard';
+    // });
   }
 
   onLoginSubmit() {
     if (!this.username || !this.password) {
+      console.log('inside onLoginSubmit --- Empty Username or Password');
       this.flashMessage.show('Enter Username and Password', {
         cssClass: 'alert-danger',
         timeout: 5000
       });
+      this.router.navigate(['login']);
       return false;
     }
 
@@ -57,6 +64,9 @@ export class LoginComponent implements OnInit {
           email: data.result.email
         };
         this.authService.storeUserData(token, user);
+        const returnUrlx = localStorage.getItem('returnUrl');
+        console.log(returnUrlx);
+
         const time_to_login = Date.now() + 300; // 5 min
         localStorage.setItem('timer', JSON.stringify(time_to_login));
         console.log('Inside LoginComponent ... ' + data.msg);
@@ -75,7 +85,9 @@ export class LoginComponent implements OnInit {
           });
           this.router.navigate(['/']);
         }, 30 * 60 * 1000); // Auto Logoff after 30 mins
-        // this.router.navigate(['/dashboard']);
+        // login successful so redirect to return url
+        this.router.navigateByUrl(returnUrlx);
+        // this.router.navigateByUrl(this.returnUrl);
       } else {
         console.log('Inside LoginComponent ... ' + data.msg);
         this.flashMessage.show(data.msg, {
@@ -84,8 +96,6 @@ export class LoginComponent implements OnInit {
         });
         this.returnUrl = '/login';
       }
-
-      this.router.navigateByUrl(this.returnUrl);
     });
   }
 }

@@ -12,6 +12,7 @@ export class ProfileComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
+    localStorage.setItem('returnUrl', '/profile');
     this.authService.getProfile().subscribe(
       profile => {
         // console.log(profile);

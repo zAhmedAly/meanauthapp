@@ -18,16 +18,20 @@ export class AppComponent {
     private route: ActivatedRoute
   ) {}
   ngOnInit() {
-    // Get the query params
-    this.route.queryParams.subscribe(params => {
-      console.log(
-        'LoginComponent ngOnInit params[returnUrl] = ',
-        params['returnUrl']
-      );
-      this.returnUrl = params['returnUrl'] || '/';
-    });
-
+    // get return url from route parameters or default to '/'
+    this.returnUrl =
+      this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    localStorage.setItem('returnUrl', this.returnUrl);
     console.log('AppComponent ngOnInit this.returnUrl = ', this.returnUrl);
+
+    // Get the query params
+    // this.route.queryParams.subscribe(params => {
+    //   console.log(
+    //     'LoginComponent ngOnInit params[returnUrl] = ',
+    //     params['returnUrl']
+    //   );
+    //   this.returnUrl = params['returnUrl'] || '/';
+    // });
 
     // if (!this.authService.loggedIn()) {
     const timer = JSON.parse(localStorage.getItem('timer'));
@@ -38,7 +42,7 @@ export class AppComponent {
     console.log('Date.now() - timer =', now - timer);
 
     if (timer && Date.now() - timer > 5 * 60 * 1000) {
-      //Auto Logoff after 5 mins
+      // Auto Logoff after 5 mins
       console.log('Inside AppComponent ... Auto LogOut');
       this.authService.logout();
       this.flashMessage.show('Your session has expired', {
